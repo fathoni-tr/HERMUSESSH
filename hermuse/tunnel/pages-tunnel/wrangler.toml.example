@@ -1,0 +1,14 @@
+# Template wrangler.toml untuk Pages project tunnel.
+# Salin ke wrangler.toml lalu isi:
+#   - name: nama Pages project (menentukan <name>.pages.dev)
+#   - database_name: nama D1 yang kamu buat
+#   - database_id: UUID D1 dari `wrangler d1 list` (jangan commit kalau repo publik)
+
+name = "9router-tunnel-KAMU"
+compatibility_date = "2026-09-27"
+pages_build_output_dir = "."
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tunnel-9router"
+database_id = "ISI_UUID_D1_KAMU_DI_SINI"

@@ -110,6 +110,48 @@ reverse SSH tunnel**. Semua file persistent di `~/workspace`.
 | Setup laptop | Sekali (firewall + kunci) | Tidak ada |
 | Status | ✅ Jalan | ⚠️ Terblokir proxy |
 
+## Troubleshooting (dari pengalaman 2026-10-05)
+
+### `hermes: command not found` saat SSH sebagai root
+Binary ada di `/home/hatch/.local/bin/hermes` (tidak di PATH root).
+Fix: `bash scripts/install-hermes-wrapper.sh` (sebagai root) — memasang
+wrapper `/usr/local/bin/hermes` yang otomatis masuk mode `chat` dan memakai
+config dari `/home/hatch/.hermes`.
+
+### `ModuleNotFoundError: No module named 'ruamel'` (atau dotenv, rich)
+Bundled Python hermes (`~/.hermes/tools/python-*/bin/python3`) kehilangan
+dependencies setelah VM di-replace. Fix:
+```bash
+bash scripts/fix-hermes-deps.sh
+```
+
+### `It looks like Hermes isn't configured yet` padahal sudah setup
+Config ada di `/home/hatch/.hermes/` (milik user hatch), tapi dijalankan
+sebagai root. Wrapper `install-hermes-wrapper.sh` sudah menangani ini
+dengan `export HERMES_HOME=/home/hatch/.hermes`.
+
+### Gemini API 429 (quota habis)
+Ganti ke OpenRouter:
+```bash
+bash scripts/setup-openrouter.sh <OPENROUTER_API_KEY> [MODEL_ID]
+# Contoh: bash scripts/setup-openrouter.sh sk-or-v1-xxxx openrouter/stealth/space-bunny-alpha
+```
+Script ini menambah provider OpenRouter ke 9Router, restart 9Router,
+dan update default model di `~/.hermes/config.yaml`.
+API key tidak disimpan di repo — hanya di database 9Router.
+
+### SSH `Connection refused` pada port 2223 setelah VM replace
+Kemungkinan ada tunnel duplikat berebut port. Fix dari VM:
+```bash
+bash ssh/tailscale-reverse/fix-duplicate-tunnel.sh
+```
+
+### SSH `WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!`
+VM ke-replace → host key baru. Dari laptop (PowerShell/CMD):
+```cmd
+ssh-keygen -R [127.0.0.1]:2223
+```
+
 ## Lisensi
 
 MIT

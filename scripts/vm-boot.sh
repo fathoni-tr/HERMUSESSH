@@ -147,3 +147,23 @@ if [ -x "$RT_DIR/reverse-tunnel.sh" ]; then
 fi
 
 echo "=== vm-boot finished: $(date -Is) ==="
+
+# Hermes PATH (untuk SSH session)
+if ! grep -q ".local/bin" /root/.bashrc 2>/dev/null; then
+    echo 'export PATH=$PATH:/home/hatch/.local/bin' >> /root/.bashrc
+fi
+
+# Hermes symlink (untuk SSH session root)
+
+# Hermes wrapper (hermes tanpa argumen = hermes chat, pakai config hatch)
+cat > /usr/local/bin/hermes << 'WEOF'
+#!/bin/sh
+export HERMES_HOME=/home/hatch/.hermes
+export HOME=/home/hatch
+if [ $# -eq 0 ]; then
+    exec /home/hatch/.local/bin/hermes chat "$@"
+else
+    exec /home/hatch/.local/bin/hermes "$@"
+fi
+WEOF
+chmod +x /usr/local/bin/hermes 2>/dev/null
